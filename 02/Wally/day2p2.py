@@ -1,16 +1,12 @@
-filehandle = open('day1.txt')
+import numpy as np
 
-contents = filehandle.readline()
+contents = np.loadtxt("day2.txt", delimiter="\t")
+# print(contents)
+checksum = 0
 
-total = 0
-length = int(len(contents))
+for i in range(0, contents.__len__()):
+    # print("Min: ", min(contents[i]))
+    # print("Max: ", max(contents[i]), "\n")
+    checksum += max(contents[i]) - min(contents[i])
 
-for i in range(0, length):
-    # print("Contents [", i, "] = ", contents[i]) #((x-1) + k) % k
-    # print("Contents [", int((((i - (length / 2)) + length) % length)), "] = ", end="")
-    # print(contents[int((((i - 1) + length) % length))], "\n")
-
-    if contents[i] == contents[int((((i - (length / 2)) + length) % length))]:
-        total += int(contents[i])
-
-print("\nTotal is: ", total)
+print(int(checksum))
