@@ -67,8 +67,34 @@
 #      each iteration.
 #   Iterate through the now-pruned dictionary and create the edges for each vertex (key) and children (iterate through
 #      the value list).
-
-from anytree import AnyNode, RenderTree
+#
+# --- Part Two ---
+#
+# The programs explain the situation: they can't get down. Rather, they could get down, if they weren't expending all
+#  of their energy trying to keep the tower balanced. Apparently, one program has the wrong weight, and until it's
+#  fixed, they're stuck here.
+#
+# For any program holding a disc, each program standing on that disc forms a sub-tower. Each of those sub-towers are
+#  supposed to be the same weight, or the disc itself isn't balanced. The weight of a tower is the sum of the weights
+#  of the programs in that tower.
+#
+# In the example above, this means that for ugml's disc to be balanced, gyxo, ebii, and jptl must all have the same
+#  weight, and they do: 61.
+#
+# However, for tknk to be balanced, each of the programs standing on its disc and all programs above it must each
+#  match. This means that the following sums must all be the same:
+#
+# ugml + (gyxo + ebii + jptl) = 68 + (61 + 61 + 61) = 251
+# padx + (pbga + havc + qoyq) = 45 + (66 + 66 + 66) = 243
+# fwft + (ktlj + cntj + xhth) = 72 + (57 + 57 + 57) = 243
+#
+# As you can see, tknk's disc is unbalanced: ugml's stack is heavier than the other two. Even though the nodes above
+#  ugml are balanced, ugml itself is too heavy: it needs to be 8 units lighter for its stack to weigh 243 and keep
+#  the towers balanced. If this change were made, its weight would be 60.
+#
+# Given that exactly one program is the wrong weight, what would its weight need to be to balance the entire tower?
+#############################################################################
+from anytree import *
 
 def parsefile(fname):
     f = open(fname, 'r')
@@ -96,13 +122,9 @@ def parsefile(fname):
     return dict
 
 #############################################################################
+def buildTree(dict):
 
-def main():
-    fname = 'input.txt'
-    dict = {}
     kdict = {}
-    dict = parsefile(fname)             # Read the input file into a dictionary, where the id is a node and the key
-                                        #   is either None for a leaf, or a list for a branch
 
     for k in dict.keys():               # Build the node list from all nodes in the dictionary; add properties (id, weight)
         kdict[k[0]] = AnyNode(id = k[0], weight = k[1])
@@ -117,9 +139,38 @@ def main():
             lst = [kdict[c] for c in i[1]]
             n.children = lst
 
+    return kdict
+#############################################################################
+
+def main():
+    fname = 'input.txt'
+    dict = {}
+    kdict = {}
+    dict = parsefile(fname)             # Read the input file into a dictionary, where the id is a node and the key
+                                        #   is either None for a leaf, or a list for a branch
+
+    kdict = buildTree(dict)
+
     for i in kdict.items():             # Find the node without a parent in the node list
         if i[1].parent == None:
-            print('Part 1 result: Node {} / Parent: {}').format(i, i[1].parent)
+            root = i
+            print('Part 1 result: Node {} / Parent: {}\n').format(i, i[1].parent)
+
+    # Part 2 solve was easier to follow the difference by walking down the tree levels (breadth-first) until
+    # the fourth level, where all branches balanced. The correct solution with this input file was
+    # on the third level ('mfzpvpj') with a weight of 604. In order to correct the -8 point discrepancy, the weight
+    # must be adjusted to 596 to correct the weight sums back up the tree.
+
+    tree = kdict[root[0]]       # root[0] -> aazgvmc (64499) -> zuahdoy (2162)
+    n = 2
+
+    # print(RenderTree(tree).by_attr('id'))
+    # print([[(node.id, node.weight) for node in children] for children in LevelOrderGroupIter(tree, maxlevel = 2)])
+
+    firstlevel = [[node for node in children] for children in LevelOrderGroupIter(tree)]
+    for f in firstlevel[n-1]:
+        total = sum([node.weight for node in PreOrderIter(f)])
+        print('{}th level: {}\tweight: {}\tsum: {}').format(n, f.id, f.weight, total)
 
 if __name__ == '__main__':
     main()
