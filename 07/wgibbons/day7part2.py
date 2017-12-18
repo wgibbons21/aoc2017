@@ -1,4 +1,4 @@
-filehandle = open("day12.txt")
+filehandle = open("day7.txt")
 
 contents = filehandle.readlines()
 b = [x for x in range(2000)]

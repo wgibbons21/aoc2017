@@ -1,32 +1,25 @@
-import numpy as np
+filehandle = open("day7.txt")
 
-contents = np.loadtxt("day12.txt", delimiter="\t")
-contents = contents.astype(int)
-i = 0       #index into array, current jump location
-jumps = 1   #count the number of jumps made
-#print(contents, contents.size)
+contents = filehandle.readlines()
 
-def traverse(contents, i, jumps):
-    #print(contents)
-    print("i = ", i)
-    print("contents[i] = ", contents[i])
-    print("call->traverse(contents,", i, ",", jumps, ")\n")
-    if (i + contents[i] < 0) or (i + contents[i] >= contents.size): #stopping condition - outside bounds of array
-        print("Total jumps =", jumps)
-        #return jumps
-    else:
-        temp = contents[i]                                          #save current index before we increment
-        contents[i] += 1                                            #increment current jump instruction by 1
-        #print("jumps =", jumps)
-        traverse(contents, temp + i, jumps + 1)
+dictionary = {}
+i = 0
+for i in range(0,contents.__len__()): #contents.__len__() - 1
+    contents[i] = contents[i].replace("<-> ", '')
+    contents[i] = contents[i].replace(",", '').split(" ")
+    for j in range(0, len(contents[i])):
+        contents[i][j] = int(contents[i][j])
 
-#traverse(contents, i, jumps)
+for i in range(0, contents.__len__() - 1):
+    dictionary[i] = contents[i][1::]
 
-while not (i + contents[i] < 0 or (i + contents[i] >= contents.size)): # stopping condition - outside bounds of array
-    temp = contents[i]                          # save current index before we increment
-    contents[i] += 1                            # increment current jump instruction by 1
-    # print("jumps =", jumps)
-    i = temp + i
-    jumps += 1
+#http://code.activestate.com/recipes/576723-dfs-and-bfs-graph-traversal/
+def recursive_dfs(graph, start, path=[]):
+  '''recursive depth first search from start'''
+  path=path+[start]
+  for node in graph[start]:
+    if not node in path:
+      path=recursive_dfs(graph, node, path)
+  return path
 
-print("Total jumps =", jumps)
+print(len(recursive_dfs(dictionary, 0)))
